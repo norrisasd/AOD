@@ -44,7 +44,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        bg = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.bg01));
+        bg = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.bg03));
         player = new Player(BitmapFactory.decodeResource(getResources(), R.drawable.ufo1), 128, 56, 3);
         coins = new ArrayList<Coin>();
         coinStartTime = System.nanoTime();
@@ -233,7 +233,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         this.ctr=0;
         player.resetDY();
         player.setY(HEIGHT / 2);
-        bg.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.bg01));
+        bg.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.bg03));
         if(player.getScore() > best) {
             best = player.getScore();
         }
@@ -257,7 +257,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             paint1.setTextSize(30);
             paint1.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
             canvas.drawText("PRESS TO START", WIDTH / 2 - 70, HEIGHT / 2, paint1);
-
             paint1.setTextSize(18);
             canvas.drawText("PRESS AND HOLD TO GO UP", WIDTH / 2 - 70, HEIGHT / 2 + 20, paint1);
             canvas.drawText("RELEASE TO GO DOWN", WIDTH / 2 - 70, HEIGHT / 2 + 40, paint1);
