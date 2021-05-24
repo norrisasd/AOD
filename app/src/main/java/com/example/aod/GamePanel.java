@@ -13,12 +13,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public static final int WIDTH = 683;
-    public static final int HEIGHT = 384;
-    public static final int MOVESPEED = -7;
+    public static final int HEIGHT = 384;// CANVAS
+    public static final int MOVESPEED = -7;// MOVEMENT SPEED
     private long missileStartTime;
     private long coinStartTime;
     private MainThread thread;
@@ -31,19 +30,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private Explosion explosion;
     private long startReset;
     private boolean reset;
-    private boolean dissapear;
+    private boolean disappear;
     private boolean started;
     private int best = 0;
     private int ctr=0;
 
-    public GamePanel(Context context) {
+    public GamePanel(Context context) {//add callback and set focusable true
         super(context);
         getHolder().addCallback(this); //add the callback to the surfaceholder to intercept events
         setFocusable(true);
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder) {
+    public void surfaceCreated(SurfaceHolder holder) {//instantiate and start the thread running
         bg = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.bg03));
         player = new Player(BitmapFactory.decodeResource(getResources(), R.drawable.ufo1), 128, 56, 3);
         coins = new ArrayList<Coin>();
@@ -61,7 +60,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder holder) {//when application sudden closed or closed it will stop the thread running
         boolean retry = true;
         int counter = 0;
         while (retry && counter < 1000) {
@@ -77,20 +76,20 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
+    public boolean onTouchEvent(MotionEvent event) {// to start game
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            if(!player.getPlaying() && newGameCreated && reset) {
+            if(!player.getPlaying() && newGameCreated && reset) {//to start the game
                 player.setPlaying(true);
                 player.setUp(true);
             }
-            if(player.getPlaying()) {
+            if(player.getPlaying()) {// updates the up and down (vertical position of the player)
                 if(!started) started = true;
                 reset = false;
                 player.setUp(true);
             }
             return true;
         }
-        if(event.getAction() == MotionEvent.ACTION_UP) {
+        if(event.getAction() == MotionEvent.ACTION_UP) {//if wala na ga tap
             player.setUp(false);
             return true;
         }
@@ -101,7 +100,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         if(player.getPlaying()) {
             bg.update();
             player.update();
-            if(player.getScore()/200 >this.ctr){
+            if(player.getScore()/500 >this.ctr){//change background sa score every divisible by 700
                 this.ctr++;
                 Bitmap img1=BitmapFactory.decodeResource(getResources(), R.drawable.bg01);
                 Bitmap img2=BitmapFactory.decodeResource(getResources(), R.drawable.bg02);
@@ -123,41 +122,41 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                         break;
                 }
             }
-            if(player.getY() > HEIGHT || player.getY() < -player.getHeight()) {// if malapas
+            if(player.getY() > HEIGHT || player.getY() < -player.getHeight()) {// if malapas sa canvas
                 player.setPlaying(false);
             }
             //add missiles on timer
-            long missileElapsed = (System.nanoTime() - missileStartTime) / 1000000;
-            if (missileElapsed > (1500 - player.getScore() / 4)) {
+            long missileElapsed = (System.nanoTime() - missileStartTime) / 1000000;// set timer for every missile to be produce
+            if (missileElapsed > (1500 - player.getScore() / 4)) {//if time for missile to be produce
                 //first missile always goes down the middle
                 if (missiles.size() == 0) {
                     missiles.add(new Missile(BitmapFactory.decodeResource(getResources(), R.drawable.missile), WIDTH + 10, HEIGHT / 2, 45, 15, player.getScore(), 13));
                 } else {
-                    missiles.add(new Missile(BitmapFactory.decodeResource(getResources(), R.drawable.missile), WIDTH + 10, (int) (rand.nextDouble() * (HEIGHT)), 45, 15, player.getScore(), 13));
-                    coins.add(new Coin(BitmapFactory.decodeResource(getResources(),R.drawable.coin),WIDTH +10, (int) (rand.nextDouble() * (HEIGHT)),40,50,player.getScore(),6));
+
+                    missiles.add(new Missile(BitmapFactory.decodeResource(getResources(), R.drawable.missile), WIDTH + 10, (int) (rand.nextDouble() * (HEIGHT-30)), 45, 15, player.getScore(), 13));
                 }
                 //reset timer
                 missileStartTime = System.nanoTime();
             }
 
             //loop through every missile and check collision and remove
-            for (int i = 0; i < missiles.size(); i++) {
+            for (int i = 0; i < missiles.size(); i++) {//check all missiles that has been produced
                 //update missile
                 missiles.get(i).update();
-                if (collision(missiles.get(i), player)) {
+                if (collision(missiles.get(i), player)) {//if collision of missile
                     missiles.remove(i);
-                    player.setPlaying(false);
+                    player.setPlaying(false);//game over
                     break;
                 }
                 //remove missile if it is way off the screen
-                if (missiles.get(i).getX() < -100) {
-                    missiles.remove(i);
+                if (missiles.get(i).getX() < -100) {//if missile out of bounds
+                    missiles.remove(i);//remove
                     break;
                 }
             }
-            long coinElapsed = (System.nanoTime() - coinStartTime) / 1000000;
-            if(coinElapsed > (500000 - player.getScore() / 4)) {
-                coins.add(new Coin(BitmapFactory.decodeResource(getResources(), R.drawable.coin), WIDTH + 10, (int) (rand.nextDouble() * (HEIGHT+50)), 40, 50, player.getScore(), 6));
+            long coinElapsed = (System.nanoTime() - coinStartTime) / 1000000;//same algo sa missile
+            if(coinElapsed > (5000 - player.getScore() / 4)) {
+                coins.add(new Coin(BitmapFactory.decodeResource(getResources(), R.drawable.coin), WIDTH + 10, (int) (rand.nextDouble() * (HEIGHT-30)), 40, 50, player.getScore(), 6));
                 coinStartTime = System.nanoTime();
             }
             for(int i = 0; i < coins.size(); i ++) {
@@ -175,12 +174,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         }
         else {
-            player.resetDY();
+            player.resetDY();//reset in  the middle
             if(!reset) {
                 newGameCreated = false;
                 startReset = System.nanoTime();
                 reset = true;
-                dissapear = true;
+                disappear = true;
                 explosion = new Explosion(BitmapFactory.decodeResource(getResources(), R.drawable.explosion),
                         player.getX(), player.getY() - 30, 100, 100, 25);
             }
@@ -202,13 +201,13 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        final float scaleFactorX = getWidth() / (WIDTH * 1.f);
+        final float scaleFactorX = getWidth() / (WIDTH * 1.f);//screen ratio
         final float scaleFactorY = getHeight() / (HEIGHT * 1.f);
         if (canvas != null) {
             final int savedState = canvas.save();
             canvas.scale(scaleFactorX, scaleFactorY);
             bg.draw(canvas);
-            if(!dissapear) {
+            if(!disappear) {
                 player.draw(canvas);
             }
             for(Missile m : missiles) {
@@ -227,18 +226,17 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void newGame() {
-        dissapear = false;
+        disappear = false;
         missiles.clear();
         coins.clear();
         this.ctr=0;
         player.resetDY();
         player.setY(HEIGHT / 2);
         bg.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.bg03));
-        if(player.getScore() > best) {
+        if(player.getScore() > best) {//get best score
             best = player.getScore();
         }
         player.resetScore();
-
         newGameCreated = true;
     }
 
