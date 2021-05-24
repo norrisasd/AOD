@@ -21,7 +21,7 @@ public class Story extends AppCompatActivity {
             @Override
             public void run() {
                 try {
-                    sleep(4000);
+                    sleep(7000);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
